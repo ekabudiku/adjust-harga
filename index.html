@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KALKULATOR CUSTOM PENAWARAN NILAI TANAH (ZNT 2026)</title>
+
+<!-- ================= LIBRARY SHEETJS ================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- ================= FAVICON ================= -->
+<link rel="icon" type="image/png" href="icon.png">
+
+<!-- ================= OPEN GRAPH (WA / FB / LINKEDIN) ================= -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ekabudiku.github.io/adjust-harga/">
+<meta property="og:title" content="Kalkulator Custom Penawaran Nilai Tanah (ZNT 26)">
+<meta property="og:description" content="DO WITH YOUR OWN RISK !!!">
+<meta property="og:image" content="https://ekabudiku.github.io/adjust-harga/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- ================= TWITTER CARD ================= -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kalkulator Custom Penawaran Nilai Tanah (ZNT 26)">
+<meta name="twitter:description" content="DO WITH YOUR OWN RISK !!!">
+<meta name="twitter:image" content="https://ekabudiku.github.io/adjust-harga/og-image.jpg">
+
+<style>
+/* ================= NEUMORPHISM VARIABLES ================= */
+:root{
+  --bg:#e0e5ec;
+  --card-bg:#e0e5ec;
+  --text-color:#333;
+  --accent:#4c6ef5;
+  --accent-hover:#364fc7;
+  --danger:#fa5252;
+  --danger-hover:#e03131;
+  --soft-shadow: 8px 8px 16px #b8bcc2, -8px -8px 16px #ffffff;
+  --inset-shadow: inset 6px 6px 12px #b8bcc2, inset -6px -6px 12px #ffffff;
+  --success-bg:#d3f9d8;
+  --success-text:#2b8a3e;
+  --input-height:46px;
+}
+
+/* ================= DARK MODE ================= */
+body.dark{
+  --bg:#1e1e1e;
+  --card-bg:#1e1e1e;
+  --text-color:#e5e5e5;
+  --accent:#74c0fc;
+  --accent-hover:#4dabf7;
+  --danger:#ff8787;
+  --danger-hover:#fa5252;
+  --soft-shadow: 8px 8px 16px #141414, -8px -8px 16px #2a2a2a;
+  --inset-shadow: inset 6px 6px 12px #141414, inset -6px -6px 12px #2a2a2a;
+  --success-bg:#2b8a3e;
+  --success-text:#d3f9d8;
+}
+
+/* ================= BASE ================= */
+body{
+  margin:0;
+  font-family:Segoe UI,Tahoma,sans-serif;
+  background:var(--bg);
+  color:var(--text-color);
+}
+.container{
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+  padding:1rem;
+  box-sizing:border-box;
+}
+.header-wrapper{
+  background:var(--card-bg);
+  padding:1.5rem;
+  border-radius:24px;
+  box-shadow:var(--soft-shadow);
+  text-align:center;
+  position:relative;
+  margin-bottom:2rem;
+}
+.topbar{ position:absolute; top:1rem; right:1rem; }
+#darkModeToggle{
+  background:var(--card-bg); border:none; width:42px; height:42px;
+  border-radius:50%; box-shadow:var(--soft-shadow); cursor:pointer; font-size:1.1rem;
+}
+
+/* ================= UPLOAD SECTION ================= */
+.upload-wrapper{
+  background:var(--card-bg); padding:1.5rem; border-radius:24px;
+  box-shadow:var(--inset-shadow); text-align:center; margin-bottom:2rem;
+}
+.upload-wrapper input[type="file"]::file-selector-button {
+  padding: 8px 16px; border-radius: 12px; border: none;
+  background: var(--card-bg); color: var(--accent); font-weight: bold;
+  cursor: pointer; box-shadow: var(--soft-shadow); margin-right: 15px; transition: 0.2s;
+}
+.upload-wrapper input[type="file"]::file-selector-button:active {
+  box-shadow: var(--inset-shadow);
+}
+
+/* ================= FORM CONTAINER ================= */
+#formContainer{
+  display:flex; justify-content:center; align-items:flex-start; gap:1.5rem; width:100%;
+}
+#formContainer:has(.sampel:nth-child(2)){
+  display:grid; grid-template-columns:1fr; justify-content:stretch; align-items:start;
+}
+
+/* ================= CARD ================= */
+.sampel, .result{
+  background:var(--card-bg); padding:1.5rem; border-radius:24px; box-shadow:var(--soft-shadow);
+  position:relative; width:100%; max-width:100%; box-sizing:border-box;
+  display:flex; flex-direction:column; height:100%;
+}
+.sampel h3, .result h4{ margin-top:0; color:var(--accent); }
+
+/* ================= FORM ================= */
+label{ font-size:.85rem; font-weight:600; margin-top:1rem; margin-bottom:.2rem; display:block; }
+input, select{
+  width:100%; height:var(--input-height); padding:0 .9rem; border:none;
+  border-radius:14px; background:var(--card-bg); box-shadow:var(--inset-shadow);
+  color:var(--text-color); font-size:.95rem; box-sizing:border-box; appearance:none;
+}
+input:focus, select:focus{ outline:none; background-color:var(--card-bg) !important; }
+input[type="text"], input[type="number"], input[type="date"], select{
+  background-color:var(--card-bg) !important; color:var(--text-color);
+}
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active{
+  -webkit-box-shadow:0 0 0 1000px var(--card-bg) inset !important;
+  -webkit-text-fill-color:var(--text-color) !important; transition:background-color 5000s ease-in-out 0s; border-radius:14px;
+}
+.input-excel { border: 2px solid var(--accent) !important; font-weight: bold; }
+
+/* ================= BUTTON ================= */
+.button-container{
+  margin:2rem 0; padding:1.5rem; border-radius:24px; box-shadow:var(--soft-shadow);
+  display:flex; flex-direction:column; gap:1rem; align-items:center;
+}
+button.main-btn{
+  width:100%; max-width:280px; height:48px; border:none; border-radius:18px;
+  background:var(--card-bg); color:var(--accent); font-weight:bold; box-shadow:var(--soft-shadow); cursor:pointer;
+}
+button.main-btn:hover{ box-shadow:var(--inset-shadow); }
+.btn-delete{
+  position:absolute; top:1rem; right:1rem; background:var(--card-bg); color:var(--danger);
+  border:none; padding:.4rem .9rem; border-radius:14px; box-shadow:var(--soft-shadow); cursor:pointer;
+}
+
+/* ================= RESULT ================= */
+#output{ display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:stretch; width:100%; }
+.result-line{ display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:0.4rem; }
+.result-line strong{ white-space:nowrap; text-align:right; flex-shrink:0; }
+.result-final{
+  margin-top:auto; padding:1rem; border-radius:18px; background:var(--success-bg);
+  color:var(--success-text); box-shadow:var(--soft-shadow); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:.4rem; text-align:center;
+}
+.result-final .value{ font-size:1.4rem; font-weight:bold; white-space:nowrap; font-variant-numeric: tabular-nums; }
+
+/* ================= FOOTER ================= */
+.footer{
+  text-align:center;
+  margin-top:3rem;
+  display:flex;
+  justify-content:center;
+}
+.insta-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:0.9rem 1.6rem;
+  background:var(--card-bg);
+  color:var(--text-color);
+  text-decoration:none;
+  font-weight:600;
+  font-size:0.95rem;
+  border-radius:50px;
+  box-shadow:var(--soft-shadow);
+  transition:all 0.2s ease-in-out;
+}
+.insta-btn:hover{
+  box-shadow:var(--inset-shadow);
+  color:var(--accent);
+  transform:translateY(2px);
+}
+.insta-btn svg{
+  width:20px;
+  height:20px;
+  fill:currentColor;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (min-width:768px){
+  .sampel, .result{ max-width:520px; }
+  #formContainer:has(.sampel:nth-child(2)){ grid-template-columns:repeat(2,1fr); }
+  #output{ grid-template-columns:repeat(2,1fr); }
+  .button-container{ flex-direction:row; justify-content:center; }
+}
+@media (min-width:1200px){
+  #formContainer{ max-width:1100px; margin-left:auto; margin-right:auto; }
+  #formContainer:has(.sampel:nth-child(2)){ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="header-wrapper">
+    <div class="topbar">
+      <button id="darkModeToggle" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    <h2>KALKULATOR PENAWARAN NILAI TANAH (ZNT 2026)</h2>
+    <h3 style="font-size: 0.9rem;">Gunakan Jika Responden Hanya Memberi Harga Penawaran Per m2</h3>
+    <h3 style="font-size: 0.9rem;">Upload excel dari olah SIPENTA klean. Input No Sampel yang mau di hitung. Enter/Tab maka atribut akan terisi otomatis</h3>
+  </div>
+
+  <div class="upload-wrapper">
+    <label for="excelUpload" style="font-size:1rem; margin-bottom: 10px;"><strong>1. Upload Database Excel (.xlsx)</strong></label>
+    <input type="file" id="excelUpload" accept=".xlsx, .xls">
+    <div id="statusExcel" style="margin-top:15px; font-weight:bold; color:var(--text-color);">Belum ada file yang diunggah.</div>
+  </div>
+
+  <div id="formContainer"></div>
+
+  <div class="button-container">
+    <button class="main-btn" onclick="tambahSampel()">+ Tambah Rencana</button>
+    <button class="main-btn" onclick="hitungMulti()">Hitung Target Harga</button>
+  </div>
+
+  <div id="output"></div>
+  
+  <!-- FOOTER DITAMBAHKAN DI SINI -->
+  <div class="footer">
+    <a href="https://instagram.com/ekabudiku" target="_blank" class="insta-btn" aria-label="Instagram Ekabudiku">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.75 2C4.57 2 2 4.57 2 7.75v8.5C2 19.43 4.57 22 7.75 22h8.5C19.43 22 22 19.43 22 16.25v-8.5C22 4.57 19.43 2 16.25 2h-8.5zm0 2h8.5C18.01 4 20 5.99 20 7.75v8.5C20 18.01 18.01 20 16.25 20h-8.5C5.99 20 4 18.01 4 16.25v-8.5C4 5.99 5.99 4 7.75 4zm4.25 2.5A5.75 5.75 0 006.25 12 5.75 5.75 0 0012 17.75 5.75 5.75 0 0017.75 12 5.75 5.75 0 0012 6.5zm0 2A3.75 3.75 0 0115.75 12 3.75 3.75 0 0112 15.75 3.75 3.75 0 018.25 12 3.75 3.75 0 0112 8.5zm5.5-3.75a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5z"/>
+      </svg>
+      @ekabudiku
+    </a>
+  </div>
+  <p style="text-align: center; font-size: 0.75rem; color: var(--text-color); opacity: 0.6; margin-top: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+    *Unofficial Tool. Gunakan dengan bijak. DO WITH YOUR OWN RISK !!!
+  </p>
+</div>
+
+<script>
+let excelData = [];
+
+// ================= BACA EXCEL =================
+document.getElementById('excelUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        // cellDates: true agar SheetJS merubah serial number excel menjadi Date
+        const workbook = XLSX.read(data, {type: 'array', cellDates: true});
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        
+        excelData = XLSX.utils.sheet_to_json(firstSheet);
+        
+        let msg = document.getElementById('statusExcel');
+        msg.innerText = "✓ File Excel berhasil dimuat! Ketik Nomor Sampel di bawah lalu tekan Enter/Tab.";
+        msg.style.color = "var(--success-text)";
+    };
+    reader.readAsArrayBuffer(file);
+});
+
+// ================= TARIK DATA =================
+function tarikDataExcel(id) {
+    const elInput = document.getElementById("nomorSampel" + id);
+    if (!elInput) return;
+    
+    const nomor = elInput.value.toString().trim();
+    if (!nomor) return;
+    if (excelData.length === 0) {
+        alert("Silakan upload file Excel terlebih dahulu pada kotak di atas!");
+        return;
+    }
+
+    const temukanNilai = (row, ...kataKunciArray) => {
+        const keys = Object.keys(row);
+        for (let kataKunci of kataKunciArray) {
+            const keywordBersih = kataKunci.toLowerCase().replace(/[^a-z0-9]/g, '');
+            let match = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === keywordBersih);
+            if (!match) {
+                match = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '').includes(keywordBersih));
+            }
+            if (match && row[match] !== undefined && row[match] !== null && row[match] !== "") {
+                return row[match];
+            }
+        }
+        return null;
+    };
+
+    // Cari Baris
+    const data = excelData.find(row => {
+        const val = temukanNilai(row, "nomorsampel");
+        return val != null && val.toString().trim() === nomor;
+    });
+
+    if (data) {
+        // 1. JENIS PROPERTI
+        let jenisRaw = temukanNilai(data, "bangunanbruko", "tanahkosong", "jenisproperti", "jenis");
+        let jenis = (jenisRaw || "").toString().trim().toUpperCase();
+        
+        let valJenis = "rumah"; 
+        
+        if (jenis === "TK" || jenis.includes("TK") || jenis.includes("KOSONG")) {
+            valJenis = "lahan";
+        } else if (jenis === "R" || jenis.includes("RUKO")) {
+            valJenis = "ruko";
+        } else if (jenis === "B" || jenis.includes("BANGUNAN") || jenis.includes("RUMAH")) {
+            valJenis = "rumah";
+        }
+        
+        document.getElementById("jenisProperti" + id).value = valJenis;
+        toggleInput(id); 
+
+        // 2. Status Kepemilikan
+        let statusRaw = temukanNilai(data, "statuskepemilikan", "status");
+        if (statusRaw) {
+            let s = statusRaw.toString().toUpperCase().trim();
+            if(s.includes("HM")) document.getElementById("status" + id).value = "HM";
+            else if(s.includes("HGB")) document.getElementById("status" + id).value = "HGB";
+            else if(s.includes("TMA")) document.getElementById("status" + id).value = "TMA";
+            else if(s.includes("HP")) document.getElementById("status" + id).value = "HP";
+        }
+
+        // 3. Rencana Jenis Data
+        let jDataRaw = temukanNilai(data, "jenisdata", "rencana");
+        if (jDataRaw) {
+            let jData = jDataRaw.toString().toLowerCase();
+            if (jData.includes("transaksi")) document.getElementById("jenis" + id).value = "Transaksi";
+            else if (jData.includes("individual")) document.getElementById("jenis" + id).value = "Individual";
+            else document.getElementById("jenis" + id).value = "Penawaran";
+        }
+
+        // 4. Tanggal Rencana / Data (PERBAIKAN MUTLAK ANTI ZONA WAKTU)
+        let tglRaw = temukanNilai(data, "tanggalpelaksanaan", "tanggal");
+        if (tglRaw) {
+            try {
+                let yyyy, mm, dd;
+
+                // Jika Excel mengirim format Objek Date (Berada di Zona UTC dari SheetJS)
+                if (tglRaw instanceof Date) {
+                    yyyy = tglRaw.getUTCFullYear();
+                    mm = String(tglRaw.getUTCMonth() + 1).padStart(2, '0');
+                    dd = String(tglRaw.getUTCDate()).padStart(2, '0');
+                } 
+                // Jika Excel mengirim format Serial Number (Angka murni)
+                else if (typeof tglRaw === "number") {
+                    let dateObj = new Date((tglRaw - 25569) * 86400 * 1000);
+                    yyyy = dateObj.getUTCFullYear();
+                    mm = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+                    dd = String(dateObj.getUTCDate()).padStart(2, '0');
+                } 
+                // Jika Excel mengirim Teks String (Misal "2026-10-11" atau "11/10/2026")
+                else if (typeof tglRaw === "string") {
+                    if (tglRaw.includes("-") && tglRaw.split("-")[0].length === 4) {
+                        // Format YYYY-MM-DD
+                        [yyyy, mm, dd] = tglRaw.split("T")[0].split("-");
+                    } else {
+                        // Memecah format Indonesia DD/MM/YYYY
+                        let parts = tglRaw.split(/[\/\-]/);
+                        if (parts.length === 3) {
+                            if (parts[2].length === 4) { // DD/MM/YYYY
+                                dd = parts[0].padStart(2, '0');
+                                mm = parts[1].padStart(2, '0');
+                                yyyy = parts[2];
+                            } else if (parts[0].length === 4) { // YYYY/MM/DD
+                                yyyy = parts[0];
+                                mm = parts[1].padStart(2, '0');
+                                dd = parts[2].padStart(2, '0');
+                            }
+                        }
+                    }
+                }
+
+                // Masukkan mutlak ke HTML tanpa konversi zona waktu
+                if (yyyy && mm && dd) {
+                    document.getElementById("tanggal" + id).value = `${yyyy}-${mm}-${dd}`;
+                }
+            } catch(err) {
+                console.log("Format tanggal tidak dikenali:", tglRaw);
+            }
+        }
+
+        // 5. Luas Tanah (m2)
+        document.getElementById("luasTanah" + id).value = parseFloat(temukanNilai(data, "luastanah", "luas")) || 0;
+
+        // 6. Form Bangunan (Jika Bukan Lahan Kosong)
+        if (valJenis !== "lahan") {
+            document.getElementById("luasBangunan" + id).value = parseFloat(temukanNilai(data, "luasbangunan")) || 0;
+            document.getElementById("tahunPembuatan" + id).value = parseInt(temukanNilai(data, "tahunpembuatan")) || "";
+            document.getElementById("tahunRenovasi" + id).value = parseInt(temukanNilai(data, "tahunrenovasi")) || "";
+            
+            let kondisiRaw = temukanNilai(data, "keadaanfisik", "kondisi");
+            if (kondisiRaw) {
+                let k = kondisiRaw.toString().toUpperCase().trim();
+                if (k.includes("BAIK SEKALI")) k = "BS";
+                else if (k.includes("JELEK SEKALI")) k = "JS";
+                else if (k.includes("BAIK")) k = "B";
+                else if (k.includes("SEDANG")) k = "S";
+                else if (k.includes("JELEK")) k = "J";
+                
+                if (["BS", "B", "S", "J", "JS"].includes(k)) {
+                    document.getElementById("kondisi" + id).value = k;
+                }
+            }
+
+            let biayaRaw = temukanNilai(data, "biayaperm2", "biaya");
+            if (biayaRaw) {
+                let bp = document.getElementById("biaya" + id);
+                bp.value = biayaRaw;
+                formatRupiah(bp); 
+            }
+        }
+        
+    } else {
+        alert("Gagal! Nomor Sampel '" + nomor + "' Ga Ketemu, Cek Lagi  Bos!.");
+    }
+}
+
+// ====== Tabel Penyusutan ======
+const tabelPenyusutan = {
+  "rumah": {
+    "low": { "BS":[0,4,8,11,14,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16], "B":[0,5,9,13,15,18,21,24,27,31,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34,34], "S":[0,6,10,14,18,22,26,29,32,35,38,41,44,47,50,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52,52], "J":[0,7,12,17,22,26,30,34,38,41,44,47,50,53,56,59,62,64,66,68,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70], "JS":[0,8,14,20,25,30,35,39,43,47,50,53,56,59,62,64,66,68,70,72,74,76,77,78,79,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80] },
+    "high": { "BS":[0,3,5,7,10,12,14,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15], "B":[0,4,7,10,13,16,19,22,24,26,28,30,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32], "S":[0,5,9,13,17,20,23,26,29,32,35,38,40,42,44,46,48,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50], "J":[0,6,11,16,20,24,28,31,34,37,40,43,46,49,52,54,56,58,60,62,64,66,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67,67], "JS":[0,7,11,16,21,27,31,35,38,43,47,50,53,56,58,60,63,65,67,69,71,73,75,76,77,78,79,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80] }
+  },
+  "ruko": {
+    "low": { "BS":[0,3,7,10,12,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14], "B":[0,4,8,11,14,17,20,23,26,28,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30], "S":[0,5,9,13,17,21,25,29,32,35,38,41,44,47,49,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51], "J":[0,6,10,14,18,22,26,30,34,38,41,44,47,50,53,56,58,60,62,64,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66], "JS":[0,7,11,15,19,23,27,31,35,39,43,47,50,53,56,59,62,64,66,68,70,72,74,76,77,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78] },
+    "high": { "BS":[0,2,4,6,8,10,12,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13], "B":[0,3,5,8,10,13,15,17,20,22,24,26,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28,28], "S":[0,4,7,10,14,18,21,24,27,30,33,36,39,41,43,45,47,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49], "J":[0,5,9,13,17,21,24,29,32,35,38,41,44,47,49,51,53,55,57,59,61,63,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65,65], "JS":[0,6,10,14,18,22,26,30,34,38,41,44,47,50,52,54,56,58,60,62,64,66,68,70,72,74,76,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77] }
+  }
+};
+
+/* ——— Utility ——— */
+function formatRupiah(el){
+  let v=el.value.toString().replace(/\D/g,'');
+  el.value=v?new Intl.NumberFormat('id-ID').format(v):'';
+}
+function formatMoney(num) { return "Rp " + Math.round(num).toLocaleString('id-ID'); }
+function formatPct(num) { return "(" + (num * 100).toFixed(2) + "%)"; }
+
+let counterSampel=0;
+
+/* ——— Tambah Sampel ——— */
+function tambahSampel(){
+  counterSampel++;
+  const c=document.getElementById("formContainer");
+  const d=document.createElement("div");
+  d.className="sampel"; d.id="sampel"+counterSampel;
+  
+  d.innerHTML=`
+    <button class="btn-delete" onclick="hapusSampel(${counterSampel})">Hapus</button>
+    <h3>Rencana Sampel ${counterSampel}</h3>
+
+    <label style="color: var(--accent);">Nomor Sampel (Auto-Tarik Excel)</label>
+    <input type="text" id="nomorSampel${counterSampel}" class="input-excel" placeholder="Ketik nomor lalu Enter/Tab" 
+           onkeydown="if(event.key === 'Enter') { event.preventDefault(); tarikDataExcel(${counterSampel}); }" 
+           onchange="tarikDataExcel(${counterSampel})">
+
+    <label>Nilai Tanah per m² (Rp) - INPUT MANUAL</label>
+    <input type="text" id="targetNilai${counterSampel}" oninput="formatRupiah(this)" placeholder="cth: 5.000.000" style="border: 1px solid var(--accent);">
+
+    <label>Jenis Properti</label>
+    <select id="jenisProperti${counterSampel}" onchange="toggleInput(${counterSampel})">
+      <option value="rumah">Rumah</option>
+      <option value="ruko">Ruko</option>
+      <option value="lahan">Lahan Kosong</option>
+    </select>
+
+    <label>Status Kepemilikan</label>
+    <select id="status${counterSampel}">
+      <option value="HM">HM</option>
+      <option value="HGB">HGB</option>
+      <option value="TMA">TMA</option>
+      <option value="HP">HP</option>
+    </select>
+
+    <label>Rencana Jenis Data</label>
+    <select id="jenis${counterSampel}">
+      <option value="Penawaran">Penawaran (Diskon 10%)</option>
+      <option value="Transaksi">Transaksi (Tanpa Diskon)</option>
+      <option value="Individual">Individual (Tanpa Diskon)</option>
+    </select>
+
+    <label>Tanggal Rencana / Data</label>
+    <input type="date" id="tanggal${counterSampel}">
+
+    <label>Luas Tanah (m²)</label>
+    <input type="number" id="luasTanah${counterSampel}">
+
+    <div id="inputBangunan${counterSampel}">
+      <label>Luas Bangunan (m²)</label>
+      <input type="number" id="luasBangunan${counterSampel}">
+      <label>Tahun Pembuatan</label>
+      <input type="number" id="tahunPembuatan${counterSampel}">
+      <label>Tahun Renovasi</label>
+      <input type="number" id="tahunRenovasi${counterSampel}">
+      <label>Kondisi</label>
+      <select id="kondisi${counterSampel}">
+        <option value="BS">Baik Sekali</option>
+        <option value="B">Baik</option>
+        <option value="S">Sedang</option>
+        <option value="J">Jelek</option>
+        <option value="JS">Jelek Sekali</option>
+      </select>
+      <label>Biaya Bangunan per m²</label>
+      <input type="text" id="biaya${counterSampel}" oninput="formatRupiah(this)">
+    </div>
+  `;
+  c.appendChild(d);
+  document.getElementById(`tanggal${counterSampel}`).value=new Date().toISOString().split('T')[0];
+  toggleInput(counterSampel);
+}
+
+function hapusSampel(id){
+  const el=document.getElementById("sampel"+id);
+  if(el) el.remove();
+  hitungMulti();
+}
+
+function toggleInput(i){
+  const jenis=document.getElementById("jenisProperti"+i).value;
+  const div=document.getElementById("inputBangunan"+i);
+  if(div) div.style.display=jenis==="lahan"?"none":"block";
+}
+
+/* ===== LOGIKA PERHITUNGAN ===== */
+function hitungMulti(){
+  document.activeElement?.blur();
+  let out=document.getElementById("output");
+  out.innerHTML="";
+
+  for(let i=1;i<=counterSampel;i++){
+    if(!document.getElementById("sampel"+i)) continue;
+
+    const targetNilai = parseFloat(document.getElementById("targetNilai"+i).value.replace(/\./g,''))||0;
+    const luasTanah = parseFloat(document.getElementById("luasTanah"+i).value)||0;
+
+    if(!targetNilai || !luasTanah){
+      out.innerHTML+=`<div class="result"><h4>Hasil Sampel ${i}</h4><p style="color:var(--danger)">Harap isi Target Nilai Tanah dan Luas Tanah!</p></div>`;
+      continue;
+    }
+
+    const hasil=prosesHitungBalik(
+      targetNilai,
+      document.getElementById("jenisProperti"+i).value,
+      document.getElementById("status"+i).value,
+      document.getElementById("jenis"+i).value,
+      new Date(document.getElementById("tanggal"+i).value),
+      luasTanah,
+      document.getElementById("luasBangunan"+i)?.value,
+      document.getElementById("tahunPembuatan"+i)?.value,
+      document.getElementById("tahunRenovasi"+i)?.value,
+      document.getElementById("kondisi"+i)?.value,
+      document.getElementById("biaya"+i)?.value
+    );
+
+    out.innerHTML+=`<div class="result"><h4>Target Harga Sampel ${i}</h4>${hasil}</div>`;
+  }
+}
+
+function prosesHitungBalik(targetNilaiPerM2,jenisProperti,status,jenis,tanggal,luasTanah,luasBangunan,tahunPembuatan,tahunRenovasi,kondisi,biaya){
+  let faktorStatus = (status==="TMA")?0.10:(status==="HGB"||status==="HP")?0.05:0;
+  let akhir = new Date("2026-12-31");
+  let tahunSelisih = (akhir - tanggal)/(1000*60*60*24*365);
+  let persenWaktu = 0.10 * tahunSelisih;
+  let faktorTotal = 1 + persenWaktu + faktorStatus;
+
+  let totalNilaiTanahAdj = targetNilaiPerM2 * luasTanah;
+  let indikasiHargaTanah = totalNilaiTanahAdj / faktorTotal;
+  let nilaiWaktu = indikasiHargaTanah * persenWaktu;
+  let nilaiStatus = indikasiHargaTanah * faktorStatus;
+
+  if(jenisProperti === "lahan"){
+    let hargaPenyesuaian = indikasiHargaTanah;
+    let hargaListing = (jenis === "Penawaran") ? (hargaPenyesuaian / 0.9) : hargaPenyesuaian;
+    return `
+      <div class="result-line"><span>Target Nilai / m²</span><strong>${formatMoney(targetNilaiPerM2)}</strong></div>
+      <div class="result-line"><span>Faktor Waktu</span><strong>-${formatMoney(nilaiWaktu)}</strong></div>
+      <div class="result-line"><span>Faktor Status</span><strong>-${formatMoney(nilaiStatus)}</strong></div>
+      <div class="result-line"><span>Harga Setelah Diskon (90%)</span><strong>${formatMoney(hargaPenyesuaian)}</strong></div>
+      <div class="result-final"><div>Harga Yang Harus Dimasukkan</div><div class="value">${formatMoney(hargaListing)}</div></div>
+    `;
+  }
+
+  biaya = parseFloat((biaya||"0").toString().replace(/\./g,''))||0;
+  luasBangunan = parseFloat(luasBangunan)||0;
+  tahunPembuatan = parseInt(tahunPembuatan)||2026;
+  tahunRenovasi = parseInt(tahunRenovasi)||0;
+
+  const NPBB = luasBangunan * biaya;
+  let umurEfektif = 2026 - tahunPembuatan;
+  if(tahunRenovasi > tahunPembuatan) umurEfektif = ((2026 - tahunPembuatan) + 2 * (2026 - tahunRenovasi)) / 3;
+  umurEfektif = Math.ceil(Math.max(0, Math.min(50, umurEfektif)));
+
+  let kategori = (jenisProperti === "rumah") ? (biaya > 2000000 ? "high" : "low") : (biaya > 3000000 ? "high" : "low");
+  const persen = tabelPenyusutan[jenisProperti][kategori][kondisi]?.[umurEfektif] || 0;
+  
+  const nilaiBangunan = NPBB - (NPBB * (persen / 100));
+  let hargaPenyesuaian = indikasiHargaTanah + nilaiBangunan;
+  let hargaListing = (jenis === "Penawaran") ? (hargaPenyesuaian / 0.9) : hargaPenyesuaian;
+
+  return `
+    <div class="result-line"><span>Target Nilai / m²</span><strong>${formatMoney(targetNilaiPerM2)}</strong></div>
+    <div class="result-line"><span>Total Target Tanah (Adj)</span><strong>${formatMoney(totalNilaiTanahAdj)}</strong></div>
+    <div class="result-line"><span>Nilai Sisa Bangunan</span><strong>+${formatMoney(nilaiBangunan)}</strong></div>
+    <div class="result-line"><span>Total Netto (Tanah+Bgn)</span><strong>${formatMoney(hargaPenyesuaian)}</strong></div>
+    <div class="result-final"><div>Harga Yang Harus Dimasukkan</div><div class="value">${formatMoney(hargaListing)}</div></div>
+  `;
+}
+
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode",document.body.classList.contains("dark"));
+}
+
+(function(){
+  if(localStorage.getItem("darkMode")==="true") document.body.classList.add("dark");
+  tambahSampel();
+})();
+</script>
+</body>
+</html>
